@@ -1,0 +1,38 @@
+{
+  "name": "@dojo/cli-create-theme",
+  "version": "0.0.1-pre",
+  "description": "Command to scaffolk out a new theme",
+  "engines": {
+    "npm": ">=3.0.0",
+    "node": ">=6"
+  },
+  "private": true,
+  "homepage": "http://dojo.io",
+  "bugs": {
+    "url": "https://github.com/dojo/cli-create-theme/issues"
+  },
+  "license": "BSD-3-Clause",
+  "main": "main.js",
+  "files": [
+    "dist",
+    "src",
+    "typings.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dojo/cli-create-theme.git"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "@types/glob": "5.0.*",
+    "@types/grunt": "0.4.*",
+    "codecov.io": "0.1.6",
+    "@dojo/loader": "beta1",
+    "grunt": "~1.0.1",
+    "grunt-dojo2": "latest",
+    "intern": "~4.1.0",
+    "typescript": "~2.4.2"
+  }
+}
