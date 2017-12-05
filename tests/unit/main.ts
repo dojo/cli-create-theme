@@ -5,12 +5,6 @@ const { beforeEach, afterEach, describe, it } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
 
 describe('main', () => {
-	beforeEach(() => {
-	});
-
-	afterEach(() => {
-	});
-
 	it('errors if the package cannot be found', async () => {
 		const sandbox = sinon.sandbox.create();
 		const promptStub: sinon.SinonStub = sandbox.stub();
@@ -38,7 +32,7 @@ describe('main', () => {
 		mockery.disable();
 	});
 
-	it('asks the correct questions', async () => {
+	it('creates css modules and a theme file', async () => {
 		mockery.enable({warnOnUnregistered: false});
 		mockery.registerAllowable('../../src/main', true);
 
