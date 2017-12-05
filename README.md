@@ -11,7 +11,7 @@ This package provides tooling support for theme generation in Dojo 2.
 Adds a `dojo create theme` command which displays an interactive instruction to ask two questions:
 
 * What Package to do you want to theme?
-* Which of the pirate theme files would you like to scaffold?
+* Which of the theme files would you like to scaffold?
 
 ## How do I use this package?
 
