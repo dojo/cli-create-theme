@@ -13,6 +13,13 @@ Adds a `dojo create theme` command which displays an interactive instruction to 
 * What Package to do you want to theme?
 * Which of the theme files would you like to scaffold?
 
+Upon successful execution of this command, `dojo create theme` creates a number of files for you in your app:
+
+* `src/themes/theme.ts`
+* `src/themes/widget/path/widget.m.css`
+
+The latter CSS module comes ready with themable CSS selectors which you can fill in the styles for.
+
 ## How do I use this package?
 
 Install `dojo/cli-create-theme` in a Dojo 2 app:
