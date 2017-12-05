@@ -18,7 +18,7 @@ Adds a `dojo create theme` command which displays an interactive instruction to 
 Install `dojo/cli-create-theme` in a Dojo 2 app:
 
 ```sh
-npm install --save-dev dojo/cli-create-theme
+npm install --save-dev @dojo/cli-create-theme
 ```
 
 Run the command: `dojo create theme`.
