@@ -19,7 +19,7 @@ function getFileQuestions(packageName: string, files: string[], cssDataFileExten
 		name: 'files',
 		choices: files.map((name: string): inquirer.ChoiceType => {
 			return {
-				name: basename(name).split(cssDataFileExtension)[0],
+				name: basename(name).split(cssDataFileExtension)[ 0 ],
 				value: name
 			};
 		})

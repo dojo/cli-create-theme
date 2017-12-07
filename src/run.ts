@@ -36,7 +36,7 @@ async function run() {
 		const selectedWidgets = await askForDesiredFiles(fileQuestions);
 
 		const themedWidgets = selectedWidgets.map((selectedWidget: string): WidgetDataInterface => {
-			const [fileName] = basename(selectedWidget).split(cssDataFileExtension);
+			const [ fileName ] = basename(selectedWidget).split(cssDataFileExtension);
 			const themeKey = join(packageName, fileName);
 			const fullWidgetPath = join(process.cwd(), selectedWidget);
 			const selectors = Object.keys(require(fullWidgetPath));
