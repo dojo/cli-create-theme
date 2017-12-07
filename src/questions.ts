@@ -5,6 +5,11 @@ const packageQuestions: inquirer.Question[] = [{
 	type: 'input',
 	name: 'package',
 	message: 'What Package to do you want to theme?'
+}, {
+	type: 'confirm',
+	name: 'askAgain',
+	message: 'Any more?',
+	default: true
 }];
 
 function getFileQuestions(packageName: string, files: string[], cssDataFileExtension: string): inquirer.Question[] {
@@ -21,10 +26,15 @@ function getFileQuestions(packageName: string, files: string[], cssDataFileExten
 	}];
 }
 
-function askForPackageName(packageQuestions: inquirer.Question[]): Promise<string> {
-	return inquirer.prompt(packageQuestions).then((answers: inquirer.Answers) => {
-		return answers.package;
-	});
+async function askForPackageNames(packageQuestions: inquirer.Question[], packages: any[] = []): Promise<string[]> {
+	const answer = await inquirer.prompt(packageQuestions);
+	packages.push(answer.package);
+
+	if (answer.askAgain) {
+		return await askForPackageNames(packageQuestions, packages);
+	} else {
+		return packages;
+	}
 }
 
 async function askForDesiredFiles(fileQuestions: inquirer.Question[]): Promise<string[]> {
@@ -35,6 +45,6 @@ async function askForDesiredFiles(fileQuestions: inquirer.Question[]): Promise<s
 export {
 	packageQuestions,
 	getFileQuestions,
-	askForPackageName,
+	askForPackageNames,
 	askForDesiredFiles
 }

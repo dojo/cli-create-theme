@@ -6,53 +6,60 @@ import { join, basename } from 'path';
 import WidgetDataInterface from './WidgetDataInterface';
 import createThemeFile from './createThemeFile';
 import convertSelectorsToCSS from './convertSelectorsToCSS';
+import flattenArray from './flattenArray';
+
 import {
 	packageQuestions,
 	getFileQuestions,
 	askForDesiredFiles,
-	askForPackageName
+	askForPackageNames
 } from './questions';
 
 async function run() {
-	const themesDirectory = 'src/themes';
-	const packageName = await askForPackageName(packageQuestions);
-
-	const selectedpackagePath = join('node_modules', packageName, 'theme');
-
-	if (!fs.existsSync(selectedpackagePath)) {
-		throw new Error(`This package path does not exist: ${selectedpackagePath}`);
-	}
-
-	const cssDataFileExtension = '.m.css.js';
 	const CSSModuleExtension = '.m.css';
-	const cssDataFileGlob = join(selectedpackagePath, `**/*${cssDataFileExtension}`);
-	const matchingCSSFiles = globby.sync(cssDataFileGlob);
+	const themesDirectory = 'src/themes';
+	const packageNames = await askForPackageNames(packageQuestions);
+	const allWidgets = [];
 
-	const fileQuestions = getFileQuestions(packageName, matchingCSSFiles, cssDataFileExtension);
-	const selectedWidgets = await askForDesiredFiles(fileQuestions);
+	for (const packageName of packageNames) {
+		const selectedpackagePath = join('node_modules', packageName, 'theme');
 
-	const themedWidgets = selectedWidgets.map((selectedWidget: string): WidgetDataInterface => {
-		const [fileName] = basename(selectedWidget).split(cssDataFileExtension);
-		const themeKey = join(packageName, fileName);
-		const fullWidgetPath = join(process.cwd(), selectedWidget);
-		const selectors = Object.keys(require(fullWidgetPath));
+		if (!fs.existsSync(selectedpackagePath)) {
+			throw new Error(`This package path does not exist: ${selectedpackagePath}`);
+		}
 
-		const newFileOutput = convertSelectorsToCSS(selectors);
-		const widgetThemePath = `${themesDirectory}/${themeKey}`;
-		const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
+		const cssDataFileExtension = '.m.css.js';
+		const cssDataFileGlob = join(selectedpackagePath, `**/*${cssDataFileExtension}`);
+		const matchingCSSFiles = globby.sync(cssDataFileGlob);
 
-		mkdirp.sync(widgetThemePath);
-		fs.writeFileSync(newFilePath, newFileOutput);
+		const fileQuestions = getFileQuestions(packageName, matchingCSSFiles, cssDataFileExtension);
+		const selectedWidgets = await askForDesiredFiles(fileQuestions);
 
-		return {
-			themeKey,
-			fileName
-		};
-	});
+		const themedWidgets = selectedWidgets.map((selectedWidget: string): WidgetDataInterface => {
+			const [fileName] = basename(selectedWidget).split(cssDataFileExtension);
+			const themeKey = join(packageName, fileName);
+			const fullWidgetPath = join(process.cwd(), selectedWidget);
+			const selectors = Object.keys(require(fullWidgetPath));
+
+			const newFileOutput = convertSelectorsToCSS(selectors);
+			const widgetThemePath = `${themesDirectory}/${themeKey}`;
+			const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
+
+			mkdirp.sync(widgetThemePath);
+			fs.writeFileSync(newFilePath, newFileOutput);
+
+			return {
+				themeKey,
+				fileName
+			};
+		});
+
+		allWidgets.push(themedWidgets);
+	}
 
 	await createThemeFile({
 		themesDirectory,
-		themedWidgets,
+		themedWidgets: flattenArray(allWidgets),
 		CSSModuleExtension
 	});
 }
