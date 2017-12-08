@@ -81,13 +81,7 @@ describe('main', () => {
 		});
 
 		const renderFilesStub: sinon.SinonStub = sandbox.stub();
-		renderFilesStub.returns(async function() {
-			return true;
-		});
-
-		mockery.registerMock('@dojo/cli-create-app/renderFiles', {
-			default: renderFilesStub
-		});
+		renderFilesStub.returns(function() {});
 
 		mockery.registerMock(`${process.cwd()}/some-file-1`, {
 			['file-1-key-1']: 'value 1',
@@ -129,7 +123,11 @@ describe('main', () => {
 
 		const {run} = (require('../../src/main')).default;
 
-		await run();
+		await run({
+			command: {
+				renderFiles: renderFilesStub
+			}
+		});
 
 		assert.equal(promptStub.callCount, 4, 'The user was prompted the correct amount of times');
 

@@ -1,3 +1,4 @@
+import { Helper } from '@dojo/interfaces/cli';
 import * as fs from 'fs-extra';
 import * as globby from 'globby';
 import * as mkdirp from 'mkdirp';
@@ -15,7 +16,7 @@ import {
 	askForPackageNames
 } from './questions';
 
-async function run() {
+async function run(helper: Helper) {
 	const CSSModuleExtension = '.m.css';
 	const themesDirectory = 'src/themes';
 	const packageNames = await askForPackageNames(packageQuestions);
@@ -58,6 +59,7 @@ async function run() {
 	}
 
 	await createThemeFile({
+		renderFiles: helper.command.renderFiles,
 		themesDirectory,
 		themedWidgets: flattenArray(allWidgets),
 		CSSModuleExtension

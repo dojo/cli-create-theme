@@ -1,4 +1,3 @@
-import renderFiles from '@dojo/cli-create-app/renderFiles';
 import { join, basename } from 'path';
 import * as camelcase from 'camelcase';
 import * as fs from 'fs-extra';
@@ -10,11 +9,13 @@ const packagePath = pkgDir.sync(__dirname);
 async function createThemeFile({
 	themesDirectory,
 	themedWidgets,
-	CSSModuleExtension
+	CSSModuleExtension,
+	renderFiles
 }: {
 	themesDirectory: string,
 	themedWidgets: WidgetDataInterface[],
-	CSSModuleExtension: string
+	CSSModuleExtension: string,
+	renderFiles: any
 }): Promise<void> {
 	const mainThemeFileName = `theme.ts`;
 	const fullThemeFilePath = join(process.cwd(), themesDirectory, mainThemeFileName);
@@ -37,8 +38,10 @@ async function createThemeFile({
 		};
 	});
 
-	await renderFiles([{
-		src: join(packagePath, 'templates', 'src', `${mainThemeFileName}.ejs`),
+	const src = join(packagePath, 'templates', 'src', `${mainThemeFileName}.ejs`);
+
+	renderFiles([{
+		src,
 		dest: fullThemeFilePath
 	}], {
 		CSSModules: CSSModulesData

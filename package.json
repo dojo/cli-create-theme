@@ -46,7 +46,6 @@
     "typescript": "~2.4.2"
   },
   "dependencies": {
-    "@dojo/cli-create-app": "^0.2.0",
     "camelcase": "^4.1.0",
     "fs-extra": "^4.0.2",
     "globby": "^7.1.1",
