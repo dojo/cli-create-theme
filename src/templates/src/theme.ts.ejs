@@ -1,0 +1,9 @@
+<% for (var module in CSSModules) { %>
+import * as <%= CSSModules[module].themeKeyVariable %> from './<%= CSSModules[module].path %>';
+<% } %>
+
+export default {
+	<% for (var module in CSSModules) { %>
+	'<%= CSSModules[module].themeKey %>': <%= CSSModules[module].themeKeyVariable %>,
+	<% } %>
+};

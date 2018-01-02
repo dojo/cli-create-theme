@@ -1,7 +1,7 @@
 {
   "name": "@dojo/cli-create-theme",
   "version": "0.0.1-pre",
-  "description": "Command to scaffolk out a new theme",
+  "description": "Command to scaffold out a new theme",
   "engines": {
     "npm": ">=3.0.0",
     "node": ">=6"
@@ -23,16 +23,34 @@
     "url": "https://github.com/dojo/cli-create-theme.git"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "build": "./node_modules/.bin/grunt release --pre-release-tag=rc --dry-run --skip-checks --initial --force"
   },
   "devDependencies": {
-    "@types/glob": "5.0.*",
-    "@types/grunt": "0.4.*",
-    "codecov.io": "0.1.6",
     "@dojo/loader": "beta1",
+    "@types/camelcase": "^4.1.0",
+    "@types/fs-extra": "^4.0.5",
+    "@types/glob": "5.0.*",
+    "@types/globby": "^6.1.0",
+    "@types/grunt": "0.4.*",
+    "@types/inquirer": "0.0.35",
+    "@types/mkdirp": "^0.5.2",
+    "@types/mockery": "^1.4.29",
+    "@types/sinon": "^4.0.0",
+    "codecov.io": "0.1.6",
     "grunt": "~1.0.1",
     "grunt-dojo2": "latest",
     "intern": "~4.1.0",
+    "mockery": "^2.1.0",
+    "sinon": "^4.1.2",
     "typescript": "~2.4.2"
+  },
+  "dependencies": {
+    "camelcase": "^4.1.0",
+    "fs-extra": "^4.0.2",
+    "globby": "^7.1.1",
+    "inquirer": "^4.0.1",
+    "mkdirp": "^0.5.1",
+    "pkg-dir": "^2.0.0"
   }
 }

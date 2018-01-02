@@ -1,20 +1,36 @@
 # @dojo/cli-create-theme
 
-<!-- TODO: change and uncomment
 [![Build Status](https://travis-ci.org/dojo/cli-create-theme.svg?branch=master)](https://travis-ci.org/dojo/cli-create-theme)
 [![codecov](https://codecov.io/gh/dojo/cli-create-theme/branch/master/graph/badge.svg)](https://codecov.io/gh/dojo/cli-create-theme)
 [![npm version](https://badge.fury.io/js/dojo-cli-create-theme.svg)](http://badge.fury.io/js/dojo-cli-create-theme)
--->
 
-TODO: Replace with a description of this package
+This package provides tooling support for theme generation in Dojo 2.
 
 ## Features
 
-TODO: Add sections on features of this package
+Adds a `dojo create theme` command which displays an interactive instruction to ask two questions:
+
+* What Package to do you want to theme?
+* Which of the theme files would you like to scaffold?
+
+Upon successful execution of this command, `dojo create theme` creates a number of files for you in your app:
+
+* `src/themes/theme.ts`
+* `src/themes/widget/path/widget.m.css`
+
+The latter CSS module comes ready with themable CSS selectors which you can fill in the styles for.
 
 ## How do I use this package?
 
-TODO: Add appropriate usage and instruction guidelines
+Install `dojo/cli-create-theme` in a Dojo 2 app:
+
+```sh
+npm install --save-dev @dojo/cli-create-theme
+```
+
+Run the command: `dojo create theme`.
+
+For example, if you have widgets which live in the folder: `node_modules/@dojo/widgets`, you can enter: `@dojo/widgets` as the answer to `What Package to do you want to theme?`.
 
 ## How do I contribute?
 
