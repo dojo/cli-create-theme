@@ -1,4 +1,4 @@
-import { join, basename } from 'path';
+import { join } from 'path';
 import * as camelcase from 'camelcase';
 import * as fs from 'fs-extra';
 import WidgetDataInterface from './WidgetDataInterface';

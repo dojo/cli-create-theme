@@ -1,7 +1,7 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
 
-const { beforeEach, afterEach, describe, it } = intern.getInterface('bdd');
+const { describe, it } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
 
 describe('main', () => {
