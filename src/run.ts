@@ -9,12 +9,7 @@ import createThemeFile from './createThemeFile';
 import convertSelectorsToCSS from './convertSelectorsToCSS';
 import flattenArray from './flattenArray';
 
-import {
-	packageQuestions,
-	getFileQuestions,
-	askForDesiredFiles,
-	askForPackageNames
-} from './questions';
+import { packageQuestions, getFileQuestions, askForDesiredFiles, askForPackageNames } from './questions';
 
 async function run(helper: Helper) {
 	const CSSModuleExtension = '.m.css';
@@ -37,7 +32,7 @@ async function run(helper: Helper) {
 		const selectedWidgets = await askForDesiredFiles(fileQuestions);
 
 		const themedWidgets = selectedWidgets.map((selectedWidget: string): WidgetDataInterface => {
-			const [ fileName ] = basename(selectedWidget).split(cssDataFileExtension);
+			const [fileName] = basename(selectedWidget).split(cssDataFileExtension);
 			const themeKey = join(packageName, fileName);
 			const fullWidgetPath = join(process.cwd(), selectedWidget);
 			const selectors = Object.keys(require(fullWidgetPath));

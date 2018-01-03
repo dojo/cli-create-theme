@@ -7,12 +7,11 @@ const command = {
 	eject() {
 		return {
 			npm: {
-				devDependencies: {
-				}
+				devDependencies: {}
 			},
-			copy: {
-			}
+			copy: {}
 		};
 	}
 };
+
 export default command;

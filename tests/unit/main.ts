@@ -1,7 +1,7 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
 
-const { beforeEach, afterEach, describe, it } = intern.getInterface('bdd');
+const { describe, it } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
 
 describe('main', () => {
@@ -9,16 +9,18 @@ describe('main', () => {
 		const sandbox = sinon.sandbox.create();
 		const promptStub: sinon.SinonStub = sandbox.stub();
 
-		promptStub.returns(Promise.resolve({
-			package: 'some-package'
-		}));
+		promptStub.returns(
+			Promise.resolve({
+				package: 'some-package'
+			})
+		);
 
-		mockery.enable({warnOnUnregistered: false, useCleanCache: true});
+		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
 		mockery.registerMock('inquirer', {
 			prompt: promptStub
 		});
 
-		const {run} = (require('../../src/main')).default;
+		const { run } = require('../../src/main').default;
 
 		try {
 			await run();
@@ -33,29 +35,37 @@ describe('main', () => {
 	});
 
 	it('creates css modules and a theme file', async () => {
-		mockery.enable({warnOnUnregistered: false});
+		mockery.enable({ warnOnUnregistered: false });
 		mockery.registerAllowable('../../src/main', true);
 
 		const sandbox = sinon.sandbox.create();
 		const promptStub: sinon.SinonStub = sandbox.stub();
 
-		promptStub.onCall(0).returns(Promise.resolve({
-			package: 'some-package-1',
-			askAgain: true
-		}));
+		promptStub.onCall(0).returns(
+			Promise.resolve({
+				package: 'some-package-1',
+				askAgain: true
+			})
+		);
 
-		promptStub.onCall(1).returns(Promise.resolve({
-			package: 'some-package-2',
-			askAgain: false
-		}));
+		promptStub.onCall(1).returns(
+			Promise.resolve({
+				package: 'some-package-2',
+				askAgain: false
+			})
+		);
 
-		promptStub.onCall(2).returns(Promise.resolve({
-			files: ['some-file-1', 'some-file-2', 'some-file-3']
-		}));
+		promptStub.onCall(2).returns(
+			Promise.resolve({
+				files: ['some-file-1', 'some-file-2', 'some-file-3']
+			})
+		);
 
-		promptStub.onCall(3).returns(Promise.resolve({
-			files: ['some-file-9']
-		}));
+		promptStub.onCall(3).returns(
+			Promise.resolve({
+				files: ['some-file-9']
+			})
+		);
 
 		mockery.registerMock('inquirer', {
 			prompt: promptStub
@@ -107,21 +117,15 @@ describe('main', () => {
 
 		const globbySyncStub: sinon.SinonStub = sandbox.stub();
 
-		globbySyncStub.onCall(0).returns([
-			'file-1.m.css.js',
-			'file-2.m.css.js',
-			'file-3.m.css.js'
-		]);
+		globbySyncStub.onCall(0).returns(['file-1.m.css.js', 'file-2.m.css.js', 'file-3.m.css.js']);
 
-		globbySyncStub.onCall(1).returns([
-			'file-9.m.css.js'
-		]);
+		globbySyncStub.onCall(1).returns(['file-9.m.css.js']);
 
 		mockery.registerMock('globby', {
 			sync: globbySyncStub
 		});
 
-		const {run} = (require('../../src/main')).default;
+		const { run } = require('../../src/main').default;
 
 		await run({
 			command: {
@@ -131,16 +135,19 @@ describe('main', () => {
 
 		assert.equal(promptStub.callCount, 4, 'The user was prompted the correct amount of times');
 
-		const packageQuestion = [{
-			type: 'input',
-			name: 'package',
-			message: 'What Package to do you want to theme?'
-		}, {
-			default: true,
-			message: 'Any more?',
-			name: 'askAgain',
-			type: 'confirm'
-		}];
+		const packageQuestion = [
+			{
+				type: 'input',
+				name: 'package',
+				message: 'What Package to do you want to theme?'
+			},
+			{
+				default: true,
+				message: 'Any more?',
+				name: 'askAgain',
+				type: 'confirm'
+			}
+		];
 
 		assert.deepEqual(promptStub.firstCall.args[0], packageQuestion);
 		assert.deepEqual(promptStub.secondCall.args[0], packageQuestion);
@@ -160,9 +167,12 @@ describe('main', () => {
 			type: 'checkbox',
 			message: 'Which of the some-package-2 theme files would you like to scaffold?',
 			name: 'files',
-			choices: [{
-				name: 'file-9', value: 'file-9.m.css.js'
-			}]
+			choices: [
+				{
+					name: 'file-9',
+					value: 'file-9.m.css.js'
+				}
+			]
 		});
 
 		assert.equal(mkdirpStub.callCount, 4, 'mkdir was called once per widget');
@@ -197,23 +207,29 @@ describe('main', () => {
 		const [[srcAndDest], templateData] = renderFilesStub.firstCall.args;
 
 		const expectedTemplateData = {
-			CSSModules: [{
-				path: 'some-package-1/some-file-1/some-file-1.m.css',
-				themeKeyVariable: 'someFile1',
-				themeKey: 'some-package-1/some-file-1'
-			}, {
-				path: 'some-package-1/some-file-2/some-file-2.m.css',
-				themeKeyVariable: 'someFile2',
-				themeKey: 'some-package-1/some-file-2'
-			}, {
-				path: 'some-package-1/some-file-3/some-file-3.m.css',
-				themeKeyVariable: 'someFile3',
-				themeKey: 'some-package-1/some-file-3'
-			}, {
-				path: 'some-package-2/some-file-9/some-file-9.m.css',
-				themeKey: 'some-package-2/some-file-9',
-				themeKeyVariable: 'someFile9'
-			}]};
+			CSSModules: [
+				{
+					path: 'some-package-1/some-file-1/some-file-1.m.css',
+					themeKeyVariable: 'someFile1',
+					themeKey: 'some-package-1/some-file-1'
+				},
+				{
+					path: 'some-package-1/some-file-2/some-file-2.m.css',
+					themeKeyVariable: 'someFile2',
+					themeKey: 'some-package-1/some-file-2'
+				},
+				{
+					path: 'some-package-1/some-file-3/some-file-3.m.css',
+					themeKeyVariable: 'someFile3',
+					themeKey: 'some-package-1/some-file-3'
+				},
+				{
+					path: 'some-package-2/some-file-9/some-file-9.m.css',
+					themeKey: 'some-package-2/some-file-9',
+					themeKeyVariable: 'someFile9'
+				}
+			]
+		};
 
 		assert.deepEqual(templateData, expectedTemplateData);
 
@@ -224,8 +240,14 @@ describe('main', () => {
 
 		assert.isTrue(existsSyncStub.calledAfter(promptStub), 'fs exists was called after the user was prompted');
 		assert.isTrue(globbySyncStub.calledAfter(existsSyncStub), 'A glob was matched after exists sync');
-		assert.isTrue(mkdirpStub.calledAfter(globbySyncStub), 'Directory for css module is created after scanning for CSS modules');
-		assert.isTrue(writeFileSyncStub.calledAfter(mkdirpStub), 'CSS module file is written after the directory is created');
+		assert.isTrue(
+			mkdirpStub.calledAfter(globbySyncStub),
+			'Directory for css module is created after scanning for CSS modules'
+		);
+		assert.isTrue(
+			writeFileSyncStub.calledAfter(mkdirpStub),
+			'CSS module file is written after the directory is created'
+		);
 		assert.isTrue(renderFilesStub.calledAfter(writeFileSyncStub), 'Theme file is written after the CSS modules');
 
 		sandbox.restore();

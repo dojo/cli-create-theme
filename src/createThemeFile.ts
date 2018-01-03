@@ -1,4 +1,4 @@
-import { join, basename } from 'path';
+import { join } from 'path';
 import * as camelcase from 'camelcase';
 import * as fs from 'fs-extra';
 import WidgetDataInterface from './WidgetDataInterface';
@@ -12,10 +12,10 @@ async function createThemeFile({
 	CSSModuleExtension,
 	renderFiles
 }: {
-	themesDirectory: string,
-	themedWidgets: WidgetDataInterface[],
-	CSSModuleExtension: string,
-	renderFiles: any
+	themesDirectory: string;
+	themedWidgets: WidgetDataInterface[];
+	CSSModuleExtension: string;
+	renderFiles: any;
 }): Promise<void> {
 	const mainThemeFileName = `theme.ts`;
 	const fullThemeFilePath = join(process.cwd(), themesDirectory, mainThemeFileName);
@@ -25,9 +25,7 @@ async function createThemeFile({
 		return;
 	}
 
-	const CSSModulesData = themedWidgets.map(({
-		themeKey, fileName
-	}) => {
+	const CSSModulesData = themedWidgets.map(({ themeKey, fileName }) => {
 		const CSSModulePath = `${themeKey}/${fileName}${CSSModuleExtension}`;
 		const themeKeyVariable = camelcase(fileName);
 
@@ -40,12 +38,17 @@ async function createThemeFile({
 
 	const src = join(packagePath, 'templates', 'src', `${mainThemeFileName}.ejs`);
 
-	renderFiles([{
-		src,
-		dest: fullThemeFilePath
-	}], {
-		CSSModules: CSSModulesData
-	});
+	renderFiles(
+		[
+			{
+				src,
+				dest: fullThemeFilePath
+			}
+		],
+		{
+			CSSModules: CSSModulesData
+		}
+	);
 }
 
 export default createThemeFile;

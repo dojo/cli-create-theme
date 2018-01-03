@@ -1,29 +1,34 @@
 import * as inquirer from 'inquirer';
 import { basename } from 'path';
 
-const packageQuestions: inquirer.Question[] = [{
-	type: 'input',
-	name: 'package',
-	message: 'What Package to do you want to theme?'
-}, {
-	type: 'confirm',
-	name: 'askAgain',
-	message: 'Any more?',
-	default: true
-}];
+const packageQuestions: inquirer.Question[] = [
+	{
+		type: 'input',
+		name: 'package',
+		message: 'What Package to do you want to theme?'
+	},
+	{
+		type: 'confirm',
+		name: 'askAgain',
+		message: 'Any more?',
+		default: true
+	}
+];
 
 function getFileQuestions(packageName: string, files: string[], cssDataFileExtension: string): inquirer.Question[] {
-	return [{
-		type: 'checkbox',
-		message: `Which of the ${packageName} theme files would you like to scaffold?`,
-		name: 'files',
-		choices: files.map((name: string): inquirer.ChoiceType => {
-			return {
-				name: basename(name).split(cssDataFileExtension)[ 0 ],
-				value: name
-			};
-		})
-	}];
+	return [
+		{
+			type: 'checkbox',
+			message: `Which of the ${packageName} theme files would you like to scaffold?`,
+			name: 'files',
+			choices: files.map((name: string): inquirer.ChoiceType => {
+				return {
+					name: basename(name).split(cssDataFileExtension)[0],
+					value: name
+				};
+			})
+		}
+	];
 }
 
 async function askForPackageNames(packageQuestions: inquirer.Question[], packages: any[] = []): Promise<string[]> {
@@ -42,9 +47,4 @@ async function askForDesiredFiles(fileQuestions: inquirer.Question[]): Promise<s
 	return files;
 }
 
-export {
-	packageQuestions,
-	getFileQuestions,
-	askForPackageNames,
-	askForDesiredFiles
-}
+export { packageQuestions, getFileQuestions, askForPackageNames, askForDesiredFiles };
