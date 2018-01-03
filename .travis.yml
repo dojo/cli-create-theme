@@ -14,7 +14,7 @@ install:
 - travis_retry npm install
 script:
 - grunt
-- grunt intern:browserstack --test-reporter
+- grunt intern:node --test-reporter
 - grunt uploadCoverage
 notifications:
   slack:
