@@ -1,22 +1,47 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
 
-const { describe, it } = intern.getInterface('bdd');
+const { describe, it, beforeEach, afterEach } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
 
 describe('create theme file', () => {
-	it('creates a new theme file', () => {
-		const sandbox = sinon.sandbox.create();
-		const renderFilesStub: sinon.SinonStub = sandbox.stub();
-		const joinStub: sinon.SinonStub = sandbox.stub();
+	let sandbox: sinon.SinonSandbox;
+	let joinStub: sinon.SinonStub;
+	let renderFilesStub: sinon.SinonStub;
+	let createThemeFileConfig: any;
 
-		joinStub.onCall(0).returns('dest/file/path');
-		joinStub.onCall(1).returns('path/to/src');
+	beforeEach(() => {
+		sandbox = sinon.sandbox.create();
+		joinStub = sandbox.stub();
+		renderFilesStub = sandbox.stub();
+
+		createThemeFileConfig = {
+			themesDirectory: 'path/to/theme/directory',
+			themedWidgets: [{ themeKey: 'theme-key', fileName: 'some-file-name' }],
+			CSSModuleExtension: '.ext',
+			renderFiles: renderFilesStub
+		};
 
 		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
 		mockery.registerMock('path', {
 			join: joinStub
 		});
+
+		mockery.registerMock('pkg-dir', {
+			sync: () => {}
+		});
+	});
+
+	afterEach(() => {
+		sandbox.restore();
+		mockery.deregisterAll();
+		mockery.resetCache();
+		mockery.disable();
+	});
+
+	it('creates a new theme file', () => {
+		joinStub.onCall(0).returns('dest/file/path');
+		joinStub.onCall(1).returns('path/to/src');
 
 		mockery.registerMock('camelcase', () => 'camelcased');
 
@@ -24,23 +49,12 @@ describe('create theme file', () => {
 			existsSync: () => false
 		});
 
-		mockery.registerMock('pkg-dir', {
-			sync: () => {}
-		});
-
 		const createThemeFile = require('../../src/createThemeFile').default;
-
-		createThemeFile({
-			themesDirectory: 'path/to/theme/directory',
-			themedWidgets: [{ themeKey: 'theme-key', fileName: 'some-file-name' }],
-			CSSModuleExtension: '.ext',
-			renderFiles: renderFilesStub
-		});
-
-		assert.equal(renderFilesStub.callCount, 1);
+		createThemeFile(createThemeFileConfig);
 
 		const [[files], data] = renderFilesStub.firstCall.args;
 
+		assert.equal(renderFilesStub.callCount, 1);
 		assert.deepEqual(files, {
 			src: 'path/to/src',
 			dest: 'dest/file/path'
@@ -53,21 +67,10 @@ describe('create theme file', () => {
 				themeKey: 'theme-key'
 			}
 		]);
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
 	});
 
 	it('does not creates a new theme file if one already exists', () => {
-		const sandbox = sinon.sandbox.create();
-
 		const renderFilesStub: sinon.SinonStub = sandbox.stub();
-		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
-		mockery.registerMock('path', {
-			join: () => {}
-		});
 
 		mockery.registerMock('camelcase', () => {});
 
@@ -75,24 +78,9 @@ describe('create theme file', () => {
 			existsSync: () => true
 		});
 
-		mockery.registerMock('pkg-dir', {
-			sync: () => {}
-		});
-
 		const createThemeFile = require('../../src/createThemeFile').default;
-
-		createThemeFile({
-			themesDirectory: 'path/to/theme/directory',
-			themedWidgets: [{ themeKey: 'theme-key', fileName: 'some-file-name' }],
-			CSSModuleExtension: '.ext',
-			renderFiles: renderFilesStub
-		});
+		createThemeFile(createThemeFileConfig);
 
 		assert.equal(renderFilesStub.callCount, 0);
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
 	});
 });

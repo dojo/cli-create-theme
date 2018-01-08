@@ -1,7 +1,7 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
 
-const { describe, it } = intern.getInterface('bdd');
+const { describe, it, beforeEach, afterEach } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
 
 const noopModule = {
@@ -9,8 +9,21 @@ const noopModule = {
 };
 
 describe('The main runner', () => {
+	let sandbox: sinon.SinonSandbox;
+
+	beforeEach(() => {
+		sandbox = sinon.sandbox.create();
+		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
+	});
+
+	afterEach(() => {
+		sandbox.restore();
+		mockery.deregisterAll();
+		mockery.resetCache();
+		mockery.disable();
+	});
+
 	it(`errors if the package cannot be found`, async () => {
-		const sandbox = sinon.sandbox.create();
 		const promptStub: sinon.SinonStub = sandbox.stub();
 
 		promptStub.returns(
@@ -19,12 +32,11 @@ describe('The main runner', () => {
 			})
 		);
 
-		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
 		mockery.registerMock('inquirer', {
 			prompt: promptStub
 		});
 
-		const { run } = require('../../src/main').default;
+		const run = require('../../src/run').default;
 
 		let errorMessage = '';
 
@@ -35,18 +47,9 @@ describe('The main runner', () => {
 		}
 
 		assert.equal(errorMessage, 'Error: This package path does not exist: node_modules/some-package/theme');
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
 	});
 
 	it('errors if no widgets selections are made', async () => {
-		mockery.enable({ warnOnUnregistered: true, useCleanCache: true });
-
-		const sandbox = sinon.sandbox.create();
-
 		mockery.registerMock('./createThemeFile', noopModule);
 		mockery.registerMock('./convertSelectorsToCSS', noopModule);
 
@@ -86,18 +89,9 @@ describe('The main runner', () => {
 		}
 
 		assert.equal(errorMessage, 'Error: No widgets were selected');
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
 	});
 
 	it('Creates CSS module files', async () => {
-		mockery.enable({ warnOnUnregistered: true, useCleanCache: true });
-
-		const sandbox = sinon.sandbox.create();
-
 		const writeFileSyncStub: sinon.SinonStub = sandbox.stub();
 		const mkdirpSyncStub: sinon.SinonStub = sandbox.stub();
 
@@ -159,18 +153,9 @@ describe('The main runner', () => {
 		assert.equal(writeFileSyncStub.callCount, 2);
 		assert.deepEqual(writeFileSyncStub.firstCall.args, ['new/file/path-1', 'css file contents']);
 		assert.deepEqual(writeFileSyncStub.secondCall.args, ['new/file/path-2', 'css file contents']);
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
 	});
 
 	it('Creates a theme file', async () => {
-		mockery.enable({ warnOnUnregistered: true, useCleanCache: true });
-
-		const sandbox = sinon.sandbox.create();
-
 		const createThemeFileStub: sinon.SinonStub = sandbox.stub();
 
 		const joinStub: sinon.SinonStub = sandbox.stub();
@@ -229,10 +214,5 @@ describe('The main runner', () => {
 				CSSModuleExtension: '.m.css'
 			}
 		]);
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
 	});
 });

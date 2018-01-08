@@ -1,14 +1,35 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
 
-const { describe, it } = intern.getInterface('bdd');
+const { describe, it, beforeEach, afterEach } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
 
 describe('questions', () => {
-	it('can ask for a package name once', async () => {
-		const sandbox = sinon.sandbox.create();
-		const promptStub: sinon.SinonStub = sandbox.stub();
+	let sandbox: sinon.SinonSandbox;
+	let promptStub: sinon.SinonStub;
 
+	beforeEach(() => {
+		sandbox = sinon.sandbox.create();
+		promptStub = sandbox.stub();
+		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
+
+		mockery.registerMock('inquirer', {
+			prompt: promptStub
+		});
+
+		mockery.registerMock('path', {
+			basename: (str: any) => str
+		});
+	});
+
+	afterEach(() => {
+		sandbox.restore();
+		mockery.deregisterAll();
+		mockery.resetCache();
+		mockery.disable();
+	});
+
+	it('can ask for a package name once', async () => {
 		promptStub.onCall(0).returns(
 			Promise.resolve({
 				package: 'package-1',
@@ -16,29 +37,15 @@ describe('questions', () => {
 			})
 		);
 
-		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
-		mockery.registerMock('inquirer', {
-			prompt: promptStub
-		});
-
 		const { askForPackageNames } = require('../../src/questions');
-
-		const returnVal = await askForPackageNames('some questions');
+		const packageNames = await askForPackageNames('some questions');
 
 		assert.equal(promptStub.callCount, 1);
 		assert.deepEqual(promptStub.firstCall.args, ['some questions']);
-		assert.deepEqual(returnVal, ['package-1']);
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
+		assert.deepEqual(packageNames, ['package-1']);
 	});
 
-	it('can ask for a package name many times', async () => {
-		const sandbox = sinon.sandbox.create();
-		const promptStub: sinon.SinonStub = sandbox.stub();
-
+	it('can ask for a package name repeatedly', async () => {
 		promptStub.onCall(0).returns(
 			Promise.resolve({
 				package: 'package-1',
@@ -60,40 +67,19 @@ describe('questions', () => {
 			})
 		);
 
-		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
-		mockery.registerMock('inquirer', {
-			prompt: promptStub
-		});
-
 		const { askForPackageNames } = require('../../src/questions');
-
-		const returnVal = await askForPackageNames('a question');
+		const packageNames = await askForPackageNames('a question');
 
 		assert.equal(promptStub.callCount, 3);
 		assert.deepEqual(promptStub.firstCall.args, ['a question']);
 		assert.deepEqual(promptStub.secondCall.args, ['a question']);
-
-		assert.deepEqual(returnVal, ['package-1', 'package-2', 'package-3']);
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
+		assert.deepEqual(packageNames, ['package-1', 'package-2', 'package-3']);
 	});
 
 	it('can provide access to file questions', () => {
-		const sandbox = sinon.sandbox.create();
-
-		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
-		mockery.registerMock('inquirer', {});
-		mockery.registerMock('path', {
-			basename: (str: any) => str
-		});
-
-		const { getFileQuestions } = require('../../src/questions');
-
 		const files = ['file1.extension', 'file2.extension', 'file3.extension'];
 
+		const { getFileQuestions } = require('../../src/questions');
 		const [ret] = getFileQuestions('package name', files, '.extension');
 
 		const expected = {
@@ -108,37 +94,18 @@ describe('questions', () => {
 		};
 
 		assert.deepEqual(ret, expected);
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
 	});
 
 	it('ask for desired files', async () => {
-		const sandbox = sinon.sandbox.create();
-		const promptStub: sinon.SinonStub = sandbox.stub();
-
 		promptStub.onCall(0).returns(
 			Promise.resolve({
 				files: 'some file answers'
 			})
 		);
 
-		mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
-		mockery.registerMock('inquirer', {
-			prompt: promptStub
-		});
-
 		const { askForDesiredFiles } = require('../../src/questions');
+		const desiredFiles = await askForDesiredFiles();
 
-		const returnVal = await askForDesiredFiles();
-
-		assert.equal(returnVal, 'some file answers');
-
-		sandbox.restore();
-		mockery.deregisterAll();
-		mockery.resetCache();
-		mockery.disable();
+		assert.equal(desiredFiles, 'some file answers');
 	});
 });
