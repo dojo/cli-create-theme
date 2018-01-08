@@ -69,7 +69,7 @@ describe('create theme file', () => {
 		]);
 	});
 
-	it('does not creates a new theme file if one already exists', () => {
+	it('does not create a new theme file if one already exists', () => {
 		const renderFilesStub: sinon.SinonStub = sandbox.stub();
 
 		mockery.registerMock('camelcase', () => {});
