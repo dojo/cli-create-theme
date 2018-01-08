@@ -15,7 +15,7 @@ describe('Converting selectors to CSS', () => {
 	});
 
 	it('Removes the _key selector', () => {
-		const css = convertSelectorsToCSS(['key', '_key', 'key_', '_key_']);
+		const css = convertSelectorsToCSS(['key', '_key', ' key_', '_key_']);
 		assert.equal(css, '.key {}\n\n.key_ {}\n\n._key_ {}');
 	});
 
