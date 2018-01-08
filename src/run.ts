@@ -7,7 +7,6 @@ import { join, basename } from 'path';
 import WidgetDataInterface from './WidgetDataInterface';
 import createThemeFile from './createThemeFile';
 import convertSelectorsToCSS from './convertSelectorsToCSS';
-import flattenArray from './flattenArray';
 
 import { packageQuestions, getFileQuestions, askForDesiredFiles, askForPackageNames } from './questions';
 
@@ -30,6 +29,9 @@ async function run(helper: Helper) {
 
 		const fileQuestions = getFileQuestions(packageName, matchingCSSFiles, cssDataFileExtension);
 		const selectedWidgets = await askForDesiredFiles(fileQuestions);
+		if (!selectedWidgets.length) {
+			throw new Error('No widgets were selected');
+		}
 
 		const themedWidgets = selectedWidgets.map((selectedWidget: string): WidgetDataInterface => {
 			const [fileName] = basename(selectedWidget).split(cssDataFileExtension);
@@ -50,13 +52,13 @@ async function run(helper: Helper) {
 			};
 		});
 
-		allWidgets.push(themedWidgets);
+		allWidgets.push(...themedWidgets);
 	}
 
-	await createThemeFile({
+	createThemeFile({
 		renderFiles: helper.command.renderFiles,
 		themesDirectory,
-		themedWidgets: flattenArray(allWidgets),
+		themedWidgets: allWidgets,
 		CSSModuleExtension
 	});
 }

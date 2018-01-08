@@ -6,7 +6,7 @@ import WidgetDataInterface from './WidgetDataInterface';
 const pkgDir: any = require('pkg-dir');
 const packagePath = pkgDir.sync(__dirname);
 
-async function createThemeFile({
+function createThemeFile({
 	themesDirectory,
 	themedWidgets,
 	CSSModuleExtension,
@@ -16,7 +16,7 @@ async function createThemeFile({
 	themedWidgets: WidgetDataInterface[];
 	CSSModuleExtension: string;
 	renderFiles: any;
-}): Promise<void> {
+}): void {
 	const mainThemeFileName = `theme.ts`;
 	const fullThemeFilePath = join(process.cwd(), themesDirectory, mainThemeFileName);
 

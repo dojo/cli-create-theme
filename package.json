@@ -23,7 +23,6 @@
     "url": "https://github.com/dojo/cli-create-theme.git"
   },
   "scripts": {
-    "build": "./node_modules/.bin/grunt release --pre-release-tag=rc --dry-run --skip-checks --initial --force",
     "prepublish": "grunt peerDepInstall",
     "precommit": "lint-staged",
     "prettier": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",

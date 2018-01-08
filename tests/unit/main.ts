@@ -4,8 +4,12 @@ import * as sinon from 'sinon';
 const { describe, it } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
 
-describe('main', () => {
-	it('errors if the package cannot be found', async () => {
+const noopModule = {
+	default: () => {}
+};
+
+describe('The main runner', () => {
+	it(`errors if the package cannot be found`, async () => {
 		const sandbox = sinon.sandbox.create();
 		const promptStub: sinon.SinonStub = sandbox.stub();
 
@@ -22,11 +26,15 @@ describe('main', () => {
 
 		const { run } = require('../../src/main').default;
 
+		let errorMessage = '';
+
 		try {
 			await run();
 		} catch (err) {
-			assert.equal(err, 'Error: This package path does not exist: node_modules/some-package/theme');
+			errorMessage = err;
 		}
+
+		assert.equal(errorMessage, 'Error: This package path does not exist: node_modules/some-package/theme');
 
 		sandbox.restore();
 		mockery.deregisterAll();
@@ -34,221 +42,193 @@ describe('main', () => {
 		mockery.disable();
 	});
 
-	it('creates css modules and a theme file', async () => {
-		mockery.enable({ warnOnUnregistered: false });
-		mockery.registerAllowable('../../src/main', true);
+	it('errors if no widgets selections are made', async () => {
+		mockery.enable({ warnOnUnregistered: true, useCleanCache: true });
 
 		const sandbox = sinon.sandbox.create();
-		const promptStub: sinon.SinonStub = sandbox.stub();
 
-		promptStub.onCall(0).returns(
-			Promise.resolve({
-				package: 'some-package-1',
-				askAgain: true
-			})
-		);
+		mockery.registerMock('./createThemeFile', noopModule);
+		mockery.registerMock('./convertSelectorsToCSS', noopModule);
 
-		promptStub.onCall(1).returns(
-			Promise.resolve({
-				package: 'some-package-2',
-				askAgain: false
-			})
-		);
-
-		promptStub.onCall(2).returns(
-			Promise.resolve({
-				files: ['some-file-1', 'some-file-2', 'some-file-3']
-			})
-		);
-
-		promptStub.onCall(3).returns(
-			Promise.resolve({
-				files: ['some-file-9']
-			})
-		);
-
-		mockery.registerMock('inquirer', {
-			prompt: promptStub
+		mockery.registerMock('./questions', {
+			packageQuestions: 'a question',
+			getFileQuestions: () => {},
+			askForDesiredFiles: () => Promise.resolve([]),
+			askForPackageNames: () => Promise.resolve(['package name 1'])
 		});
 
-		const existsSyncStub: sinon.SinonStub = sandbox.stub();
-		existsSyncStub.onFirstCall().returns(true);
-		existsSyncStub.onSecondCall().returns(true);
-		existsSyncStub.onThirdCall().returns(false);
-
-		const writeFileSyncStub: sinon.SinonStub = sandbox.stub();
+		mockery.registerMock('path', {
+			join: () => {},
+			basename: () => {}
+		});
 
 		mockery.registerMock('fs-extra', {
-			existsSync: existsSyncStub,
+			existsSync: () => true,
+			writeFileSync: () => {}
+		});
+
+		mockery.registerMock('mkdirp', {
+			sync: () => {}
+		});
+
+		mockery.registerMock('globby', {
+			sync: () => {}
+		});
+
+		const run = require('../../src/run').default;
+
+		let errorMessage = '';
+
+		try {
+			await run();
+		} catch (err) {
+			errorMessage = err;
+		}
+
+		assert.equal(errorMessage, 'Error: No widgets were selected');
+
+		sandbox.restore();
+		mockery.deregisterAll();
+		mockery.resetCache();
+		mockery.disable();
+	});
+
+	it('Creates CSS module files', async () => {
+		mockery.enable({ warnOnUnregistered: true, useCleanCache: true });
+
+		const sandbox = sinon.sandbox.create();
+
+		const writeFileSyncStub: sinon.SinonStub = sandbox.stub();
+		const mkdirpSyncStub: sinon.SinonStub = sandbox.stub();
+
+		const joinStub: sinon.SinonStub = sandbox.stub();
+
+		joinStub.onCall(2).returns('theme-key-1');
+		joinStub.onCall(3).returns('./widget/path/1');
+		joinStub.onCall(4).returns('new/file/path-1');
+
+		joinStub.onCall(5).returns('theme-key-2');
+		joinStub.onCall(6).returns('./widget/path/2');
+		joinStub.onCall(7).returns('new/file/path-2');
+
+		mockery.registerMock('./widget/path/1', { key: 'value' });
+		mockery.registerMock('./widget/path/2', { key: 'value2' });
+
+		mockery.registerMock('./createThemeFile', noopModule);
+		mockery.registerMock('./convertSelectorsToCSS', {
+			default: () => 'css file contents'
+		});
+
+		mockery.registerMock('./questions', {
+			packageQuestions: 'a question',
+			getFileQuestions: () => {},
+			askForDesiredFiles: () => Promise.resolve(['file-1', 'file-2']),
+			askForPackageNames: () => Promise.resolve(['package name 1'])
+		});
+
+		mockery.registerMock('path', {
+			join: joinStub,
+			basename: () => 'basename return string'
+		});
+
+		mockery.registerMock('fs-extra', {
+			existsSync: () => true,
 			writeFileSync: writeFileSyncStub
 		});
 
-		const mkdirpStub: sinon.SinonStub = sandbox.stub();
-		mkdirpStub.returns(true);
-
 		mockery.registerMock('mkdirp', {
-			sync: mkdirpStub
+			sync: mkdirpSyncStub
 		});
-
-		const renderFilesStub: sinon.SinonStub = sandbox.stub();
-		renderFilesStub.returns(function() {});
-
-		mockery.registerMock(`${process.cwd()}/some-file-1`, {
-			['file-1-key-1']: 'value 1',
-			['file-1-key-2']: 'value 2',
-			['file-1-key-3']: 'value 3'
-		});
-
-		mockery.registerMock(`${process.cwd()}/some-file-2`, {
-			['file-2-key-1']: 'value 1',
-			['file-2-key-2']: 'value 2',
-			['file-2-key-3']: 'value 3'
-		});
-
-		mockery.registerMock(`${process.cwd()}/some-file-3`, {
-			['file-3-key-1']: 'value 1',
-			['file-3-key-2']: 'value 2',
-			['file-3-key-3']: 'value 3'
-		});
-
-		mockery.registerMock(`${process.cwd()}/some-file-9`, {
-			['file-9-key-1']: 'value 1'
-		});
-
-		const globbySyncStub: sinon.SinonStub = sandbox.stub();
-
-		globbySyncStub.onCall(0).returns(['file-1.m.css.js', 'file-2.m.css.js', 'file-3.m.css.js']);
-
-		globbySyncStub.onCall(1).returns(['file-9.m.css.js']);
 
 		mockery.registerMock('globby', {
-			sync: globbySyncStub
+			sync: () => {}
 		});
 
-		const { run } = require('../../src/main').default;
+		const run = require('../../src/run').default;
 
 		await run({
 			command: {
-				renderFiles: renderFilesStub
+				renderFiles: () => {}
 			}
 		});
 
-		assert.equal(promptStub.callCount, 4, 'The user was prompted the correct amount of times');
+		assert.equal(mkdirpSyncStub.callCount, 2);
+		assert.deepEqual(mkdirpSyncStub.firstCall.args, ['src/themes/theme-key-1']);
+		assert.deepEqual(mkdirpSyncStub.secondCall.args, ['src/themes/theme-key-2']);
 
-		const packageQuestion = [
-			{
-				type: 'input',
-				name: 'package',
-				message: 'What Package to do you want to theme?'
-			},
-			{
-				default: true,
-				message: 'Any more?',
-				name: 'askAgain',
-				type: 'confirm'
+		assert.equal(writeFileSyncStub.callCount, 2);
+		assert.deepEqual(writeFileSyncStub.firstCall.args, ['new/file/path-1', 'css file contents']);
+		assert.deepEqual(writeFileSyncStub.secondCall.args, ['new/file/path-2', 'css file contents']);
+
+		sandbox.restore();
+		mockery.deregisterAll();
+		mockery.resetCache();
+		mockery.disable();
+	});
+
+	it('Creates a theme file', async () => {
+		mockery.enable({ warnOnUnregistered: true, useCleanCache: true });
+
+		const sandbox = sinon.sandbox.create();
+
+		const createThemeFileStub: sinon.SinonStub = sandbox.stub();
+
+		const joinStub: sinon.SinonStub = sandbox.stub();
+
+		joinStub.onCall(2).returns('theme-key-1');
+		joinStub.onCall(3).returns('./widget/path/1');
+		joinStub.onCall(4).returns('new/file/path-1');
+
+		mockery.registerMock('./widget/path/1', { key: 'value' });
+
+		mockery.registerMock('./createThemeFile', {
+			default: createThemeFileStub
+		});
+		mockery.registerMock('./convertSelectorsToCSS', {
+			default: () => 'css file contents'
+		});
+
+		mockery.registerMock('./questions', {
+			packageQuestions: 'a question',
+			getFileQuestions: () => {},
+			askForDesiredFiles: () => Promise.resolve(['file-1']),
+			askForPackageNames: () => Promise.resolve(['package name 1'])
+		});
+
+		mockery.registerMock('path', {
+			join: joinStub,
+			basename: () => 'basename return string'
+		});
+
+		mockery.registerMock('fs-extra', {
+			existsSync: () => true,
+			writeFileSync: () => {}
+		});
+
+		mockery.registerMock('mkdirp', {
+			sync: () => {}
+		});
+
+		mockery.registerMock('globby', {
+			sync: () => {}
+		});
+
+		const run = require('../../src/run').default;
+
+		await run({
+			command: {
+				renderFiles: 'render files mock'
 			}
-		];
-
-		assert.deepEqual(promptStub.firstCall.args[0], packageQuestion);
-		assert.deepEqual(promptStub.secondCall.args[0], packageQuestion);
-
-		assert.deepEqual(promptStub.thirdCall.args[0][0], {
-			type: 'checkbox',
-			message: 'Which of the some-package-1 theme files would you like to scaffold?',
-			name: 'files',
-			choices: [
-				{ name: 'file-1', value: 'file-1.m.css.js' },
-				{ name: 'file-2', value: 'file-2.m.css.js' },
-				{ name: 'file-3', value: 'file-3.m.css.js' }
-			]
 		});
 
-		assert.deepEqual(promptStub.getCall(3).args[0][0], {
-			type: 'checkbox',
-			message: 'Which of the some-package-2 theme files would you like to scaffold?',
-			name: 'files',
-			choices: [
-				{
-					name: 'file-9',
-					value: 'file-9.m.css.js'
-				}
-			]
-		});
-
-		assert.equal(mkdirpStub.callCount, 4, 'mkdir was called once per widget');
-		assert.deepEqual(mkdirpStub.getCall(0).args[0], 'src/themes/some-package-1/some-file-1');
-		assert.deepEqual(mkdirpStub.getCall(1).args[0], 'src/themes/some-package-1/some-file-2');
-		assert.deepEqual(mkdirpStub.getCall(2).args[0], 'src/themes/some-package-1/some-file-3');
-		assert.deepEqual(mkdirpStub.getCall(3).args[0], 'src/themes/some-package-2/some-file-9');
-
-		assert.deepEqual(writeFileSyncStub.callCount, 4, 'write file was called once per widget');
-
-		assert.deepEqual(writeFileSyncStub.getCall(0).args, [
-			`${process.cwd()}/src/themes/some-package-1/some-file-1/some-file-1.m.css`,
-			'.file-1-key-1 {}\n\n.file-1-key-2 {}\n\n.file-1-key-3 {}'
+		assert.deepEqual(createThemeFileStub.firstCall.args, [
+			{
+				renderFiles: 'render files mock',
+				themesDirectory: 'src/themes',
+				themedWidgets: [{ themeKey: 'theme-key-1', fileName: 'basename return string' }],
+				CSSModuleExtension: '.m.css'
+			}
 		]);
-
-		assert.deepEqual(writeFileSyncStub.getCall(1).args, [
-			`${process.cwd()}/src/themes/some-package-1/some-file-2/some-file-2.m.css`,
-			'.file-2-key-1 {}\n\n.file-2-key-2 {}\n\n.file-2-key-3 {}'
-		]);
-
-		assert.deepEqual(writeFileSyncStub.getCall(2).args, [
-			`${process.cwd()}/src/themes/some-package-1/some-file-3/some-file-3.m.css`,
-			'.file-3-key-1 {}\n\n.file-3-key-2 {}\n\n.file-3-key-3 {}'
-		]);
-
-		assert.deepEqual(writeFileSyncStub.getCall(3).args, [
-			`${process.cwd()}/src/themes/some-package-2/some-file-9/some-file-9.m.css`,
-			'.file-9-key-1 {}'
-		]);
-
-		assert.equal(renderFilesStub.callCount, 1);
-		const [[srcAndDest], templateData] = renderFilesStub.firstCall.args;
-
-		const expectedTemplateData = {
-			CSSModules: [
-				{
-					path: 'some-package-1/some-file-1/some-file-1.m.css',
-					themeKeyVariable: 'someFile1',
-					themeKey: 'some-package-1/some-file-1'
-				},
-				{
-					path: 'some-package-1/some-file-2/some-file-2.m.css',
-					themeKeyVariable: 'someFile2',
-					themeKey: 'some-package-1/some-file-2'
-				},
-				{
-					path: 'some-package-1/some-file-3/some-file-3.m.css',
-					themeKeyVariable: 'someFile3',
-					themeKey: 'some-package-1/some-file-3'
-				},
-				{
-					path: 'some-package-2/some-file-9/some-file-9.m.css',
-					themeKey: 'some-package-2/some-file-9',
-					themeKeyVariable: 'someFile9'
-				}
-			]
-		};
-
-		assert.deepEqual(templateData, expectedTemplateData);
-
-		assert.deepEqual(srcAndDest, {
-			src: `${process.cwd()}/templates/src/theme.ts.ejs`,
-			dest: `${process.cwd()}/src/themes/theme.ts`
-		});
-
-		assert.isTrue(existsSyncStub.calledAfter(promptStub), 'fs exists was called after the user was prompted');
-		assert.isTrue(globbySyncStub.calledAfter(existsSyncStub), 'A glob was matched after exists sync');
-		assert.isTrue(
-			mkdirpStub.calledAfter(globbySyncStub),
-			'Directory for css module is created after scanning for CSS modules'
-		);
-		assert.isTrue(
-			writeFileSyncStub.calledAfter(mkdirpStub),
-			'CSS module file is written after the directory is created'
-		);
-		assert.isTrue(renderFilesStub.calledAfter(writeFileSyncStub), 'Theme file is written after the CSS modules');
 
 		sandbox.restore();
 		mockery.deregisterAll();
