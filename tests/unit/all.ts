@@ -1,4 +1,4 @@
 import './main';
 import './questions';
-import './convertSelectorsToCss';
+import './convertSelectorsToCSS';
 import './createThemeFile';
