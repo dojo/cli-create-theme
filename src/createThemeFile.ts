@@ -1,6 +1,7 @@
 import { join } from 'path';
 import * as camelcase from 'camelcase';
 import * as fs from 'fs-extra';
+import * as chalk from 'chalk';
 import WidgetDataInterface from './WidgetDataInterface';
 
 const pkgDir: any = require('pkg-dir');
@@ -50,7 +51,9 @@ function createThemeFile({
 		}
 	);
 
-	console.log(`Please import '${fullThemeFilePath}' into your project to use your new theme`);
+	console.info(
+		`\nPlease import '${chalk.bold.underline(fullThemeFilePath)}' into your project to use your new theme`
+	);
 }
 
 export default createThemeFile;
