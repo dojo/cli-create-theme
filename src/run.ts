@@ -10,9 +10,14 @@ import convertSelectorsToCSS from './convertSelectorsToCSS';
 
 import { packageQuestions, getFileQuestions, askForDesiredFiles, askForPackageNames } from './questions';
 
-async function run(helper: Helper) {
+export interface CreateThemeArgs {
+	name: string;
+}
+
+async function run(helper: Helper, args: CreateThemeArgs) {
+	const themeName = args.name;
 	const CSSModuleExtension = '.m.css';
-	const themesDirectory = 'src/themes';
+	const themesDirectory = `src/themes/${themeName}`;
 	const packageNames = await askForPackageNames(packageQuestions);
 	const allWidgets = [];
 

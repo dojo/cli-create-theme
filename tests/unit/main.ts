@@ -41,7 +41,7 @@ describe('The main runner', () => {
 		let errorMessage = '';
 
 		try {
-			await run();
+			await run({}, { name: 'testName' });
 		} catch (err) {
 			errorMessage = err;
 		}
@@ -83,7 +83,7 @@ describe('The main runner', () => {
 		let errorMessage = '';
 
 		try {
-			await run();
+			await run({}, { name: 'testName' });
 		} catch (err) {
 			errorMessage = err;
 		}
@@ -140,15 +140,20 @@ describe('The main runner', () => {
 
 		const run = require('../../src/run').default;
 
-		await run({
-			command: {
-				renderFiles: () => {}
+		await run(
+			{
+				command: {
+					renderFiles: () => {}
+				}
+			},
+			{
+				name: 'testName'
 			}
-		});
+		);
 
 		assert.equal(mkdirpSyncStub.callCount, 2);
-		assert.deepEqual(mkdirpSyncStub.firstCall.args, ['src/themes/theme-key-1']);
-		assert.deepEqual(mkdirpSyncStub.secondCall.args, ['src/themes/theme-key-2']);
+		assert.deepEqual(mkdirpSyncStub.firstCall.args, ['src/themes/testName/theme-key-1']);
+		assert.deepEqual(mkdirpSyncStub.secondCall.args, ['src/themes/testName/theme-key-2']);
 
 		assert.equal(writeFileSyncStub.callCount, 2);
 		assert.deepEqual(writeFileSyncStub.firstCall.args, ['new/file/path-1', 'css file contents']);
@@ -200,16 +205,21 @@ describe('The main runner', () => {
 
 		const run = require('../../src/run').default;
 
-		await run({
-			command: {
-				renderFiles: 'render files mock'
+		await run(
+			{
+				command: {
+					renderFiles: 'render files mock'
+				}
+			},
+			{
+				name: 'testName'
 			}
-		});
+		);
 
 		assert.deepEqual(createThemeFileStub.firstCall.args, [
 			{
 				renderFiles: 'render files mock',
-				themesDirectory: 'src/themes',
+				themesDirectory: 'src/themes/testName',
 				themedWidgets: [{ themeKey: 'theme-key-1', fileName: 'basename return string' }],
 				CSSModuleExtension: '.m.css'
 			}
