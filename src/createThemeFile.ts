@@ -1,7 +1,7 @@
 import { join } from 'path';
 import * as camelcase from 'camelcase';
 import * as fs from 'fs-extra';
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import WidgetDataInterface from './WidgetDataInterface';
 
 const pkgDir: any = require('pkg-dir');
