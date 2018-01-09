@@ -15,6 +15,7 @@ install:
 script:
 - grunt
 - grunt intern:node --test-reporter
+- grunt dist
 - grunt uploadCoverage
 notifications:
   slack:

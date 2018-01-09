@@ -1,17 +1,10 @@
 import run from './run';
+import { Command } from '@dojo/interfaces/cli';
 
-const command = {
+const command: Command = {
 	description: 'Generate theme files from widgets',
 	register() {},
-	run,
-	eject() {
-		return {
-			npm: {
-				devDependencies: {}
-			},
-			copy: {}
-		};
-	}
+	run
 };
 
 export default command;
