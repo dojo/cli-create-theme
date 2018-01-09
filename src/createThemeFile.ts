@@ -19,10 +19,13 @@ function createThemeFile({
 	renderFiles: any;
 }): void {
 	const mainThemeFileName = `theme.ts`;
-	const fullThemeFilePath = join(process.cwd(), themesDirectory, mainThemeFileName);
+	const relativeThemeFilePath = join(themesDirectory, mainThemeFileName);
+	const absoluteThemeFilePath = join(process.cwd(), relativeThemeFilePath);
 
-	if (fs.existsSync(fullThemeFilePath)) {
-		console.log(`A theme file already exists in ${fullThemeFilePath}. Will not overwrite.`);
+	if (fs.existsSync(absoluteThemeFilePath)) {
+		console.info(
+			`A theme file already exists in '${chalk.bold.underline(relativeThemeFilePath)}'. Will not overwrite.`
+		);
 		return;
 	}
 
@@ -43,7 +46,7 @@ function createThemeFile({
 		[
 			{
 				src,
-				dest: fullThemeFilePath
+				dest: absoluteThemeFilePath
 			}
 		],
 		{
@@ -52,7 +55,7 @@ function createThemeFile({
 	);
 
 	console.info(
-		`\nPlease import '${chalk.bold.underline(fullThemeFilePath)}' into your project to use your new theme`
+		`\nPlease import '${chalk.bold.underline(relativeThemeFilePath)}' into your project to use your new theme`
 	);
 }
 

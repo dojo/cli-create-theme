@@ -40,8 +40,9 @@ describe('create theme file', () => {
 	});
 
 	it('creates a new theme file', () => {
-		joinStub.onCall(0).returns('dest/file/path');
-		joinStub.onCall(1).returns('path/to/src');
+		joinStub.onCall(0).returns('relative/dest/file/path');
+		joinStub.onCall(1).returns('absolute/dest/file/path');
+		joinStub.onCall(2).returns('path/to/src');
 
 		mockery.registerMock('camelcase', () => 'camelcased');
 
@@ -57,7 +58,7 @@ describe('create theme file', () => {
 		assert.equal(renderFilesStub.callCount, 1);
 		assert.deepEqual(files, {
 			src: 'path/to/src',
-			dest: 'dest/file/path'
+			dest: 'absolute/dest/file/path'
 		});
 
 		assert.deepEqual(data.CSSModules, [
