@@ -49,6 +49,8 @@ function createThemeFile({
 			CSSModules: CSSModulesData
 		}
 	);
+
+	console.log(`Please import '${fullThemeFilePath}' into your project to use your new theme`);
 }
 
 export default createThemeFile;
