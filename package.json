@@ -29,6 +29,7 @@
     "test": "grunt test"
   },
   "devDependencies": {
+    "@dojo/cli": "0.4.2",
     "@dojo/loader": "beta1",
     "@types/camelcase": "^4.1.0",
     "@types/fs-extra": "^4.0.5",
