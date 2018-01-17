@@ -1,6 +1,6 @@
 {
   "name": "@dojo/cli-create-theme",
-  "version": "0.1.1-pre",
+  "version": "0.1.1",
   "description": "Command to scaffold out a new theme",
   "engines": {
     "npm": ">=3.0.0",
