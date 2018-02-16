@@ -1,4 +1,4 @@
-import { Helper } from '@dojo/interfaces/cli';
+import { Helper } from '@dojo/cli/interfaces';
 import * as fs from 'fs-extra';
 import * as globby from 'globby';
 import * as mkdirp from 'mkdirp';
