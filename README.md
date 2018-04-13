@@ -6,6 +6,10 @@
 
 This package provides tooling support for theme generation in Dojo 2.
 
+Imagine a scenario in which you are using third-party widgets in your Dojo 2 application (or the widgets provided by `@dojo/widgets`) and you want to theme them to match your existing application styles. This is where the `dojo create theme` command helps you.
+
+This package will quickly generate theme scaffolding for third party widgets.
+
 ## Features
 
 Adds a `dojo create theme` command which displays an interactive instruction to ask two questions:
