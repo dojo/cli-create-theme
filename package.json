@@ -39,6 +39,7 @@
     "@types/inquirer": "0.0.35",
     "@types/mkdirp": "^0.5.2",
     "@types/mockery": "^1.4.29",
+    "@types/node": "~9.6.5",
     "@types/sinon": "^4.0.0",
     "codecov.io": "0.1.6",
     "grunt": "~1.0.1",
