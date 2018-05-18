@@ -62,12 +62,14 @@ describe('The main runner', () => {
 
 		mockery.registerMock('path', {
 			join: () => {},
-			basename: () => {}
+			basename: () => {},
+			dirname: () => ''
 		});
 
 		mockery.registerMock('fs-extra', {
 			existsSync: () => true,
-			writeFileSync: () => {}
+			writeFileSync: () => {},
+			copySync: () => {}
 		});
 
 		mockery.registerMock('mkdirp', {
@@ -96,14 +98,20 @@ describe('The main runner', () => {
 		const mkdirpSyncStub: sinon.SinonStub = sandbox.stub();
 
 		const joinStub: sinon.SinonStub = sandbox.stub();
+		const dirnameStub = sandbox.stub().returns('dirname return string');
+		const copyStub = sandbox.stub();
 
 		joinStub.onCall(2).returns('theme-key-1');
 		joinStub.onCall(3).returns('./widget/path/1');
 		joinStub.onCall(4).returns('new/file/path-1');
+		joinStub.onCall(5).returns('./widget/path/1.m.css.d.ts');
+		joinStub.onCall(6).returns('new/file/path-1.m.css.d.ts');
 
-		joinStub.onCall(5).returns('theme-key-2');
-		joinStub.onCall(6).returns('./widget/path/2');
-		joinStub.onCall(7).returns('new/file/path-2');
+		joinStub.onCall(7).returns('theme-key-2');
+		joinStub.onCall(8).returns('./widget/path/2');
+		joinStub.onCall(9).returns('new/file/path-2');
+		joinStub.onCall(10).returns('./widget/path/2.m.css.d.ts');
+		joinStub.onCall(11).returns('new/file/path-2.m.css.d.ts');
 
 		mockery.registerMock('./widget/path/1', { key: 'value' });
 		mockery.registerMock('./widget/path/2', { key: 'value2' });
@@ -122,12 +130,14 @@ describe('The main runner', () => {
 
 		mockery.registerMock('path', {
 			join: joinStub,
-			basename: () => 'basename return string'
+			basename: () => 'basename return string',
+			dirname: dirnameStub
 		});
 
 		mockery.registerMock('fs-extra', {
 			existsSync: () => true,
-			writeFileSync: writeFileSyncStub
+			writeFileSync: writeFileSyncStub,
+			copySync: copyStub
 		});
 
 		mockery.registerMock('mkdirp', {
@@ -158,6 +168,12 @@ describe('The main runner', () => {
 		assert.equal(writeFileSyncStub.callCount, 2);
 		assert.deepEqual(writeFileSyncStub.firstCall.args, ['new/file/path-1', 'css file contents']);
 		assert.deepEqual(writeFileSyncStub.secondCall.args, ['new/file/path-2', 'css file contents']);
+
+		assert.isTrue(dirnameStub.calledWith('file-1'));
+		assert.isTrue(dirnameStub.calledWith('file-2'));
+
+		assert.isTrue(copyStub.calledWith('./widget/path/1.m.css.d.ts', 'new/file/path-1.m.css.d.ts'));
+		assert.isTrue(copyStub.calledWith('./widget/path/2.m.css.d.ts', 'new/file/path-2.m.css.d.ts'));
 	});
 
 	it('Creates a theme file', async () => {
@@ -168,6 +184,8 @@ describe('The main runner', () => {
 		joinStub.onCall(2).returns('theme-key-1');
 		joinStub.onCall(3).returns('./widget/path/1');
 		joinStub.onCall(4).returns('new/file/path-1');
+		joinStub.onCall(5).returns('./widget/path/1.m.css.d.ts');
+		joinStub.onCall(6).returns('new/file/path-1.m.css.d.ts');
 
 		mockery.registerMock('./widget/path/1', { key: 'value' });
 
@@ -187,12 +205,14 @@ describe('The main runner', () => {
 
 		mockery.registerMock('path', {
 			join: joinStub,
-			basename: () => 'basename return string'
+			basename: () => 'basename return string',
+			dirname: () => 'dirname return string'
 		});
 
 		mockery.registerMock('fs-extra', {
 			existsSync: () => true,
-			writeFileSync: () => {}
+			writeFileSync: () => {},
+			copySync: () => {}
 		});
 
 		mockery.registerMock('mkdirp', {

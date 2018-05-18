@@ -2,7 +2,7 @@ import { Helper } from '@dojo/cli/interfaces';
 import * as fs from 'fs-extra';
 import * as globby from 'globby';
 import * as mkdirp from 'mkdirp';
-import { join, basename } from 'path';
+import { join, basename, dirname } from 'path';
 
 import WidgetDataInterface from './WidgetDataInterface';
 import createThemeFile from './createThemeFile';
@@ -29,6 +29,7 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 		}
 
 		const cssDataFileExtension = '.m.css.js';
+		const cssDefinitionFileExtension = '.m.css.d.ts';
 		const cssDataFileGlob = join(selectedpackagePath, `**/*${cssDataFileExtension}`);
 		const matchingCSSFiles = globby.sync(cssDataFileGlob);
 
@@ -50,6 +51,17 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 
 			mkdirp.sync(widgetThemePath);
 			fs.writeFileSync(newFilePath, newFileOutput);
+
+			// copy the .d.ts file for the css module
+			const definitionFile = `${fileName}${cssDefinitionFileExtension}`;
+			const definitionFullPath = join(process.cwd(), dirname(selectedWidget), definitionFile);
+
+			if (fs.existsSync(definitionFullPath)) {
+				fs.copySync(
+					definitionFullPath,
+					join(process.cwd(), `${widgetThemePath}/${fileName}${cssDefinitionFileExtension}`)
+				);
+			}
 
 			return {
 				themeKey,
