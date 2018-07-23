@@ -67,11 +67,8 @@ describe('The main runner', () => {
 
 		mockery.registerMock('fs-extra', {
 			existsSync: () => true,
-			writeFileSync: () => {}
-		});
-
-		mockery.registerMock('mkdirp', {
-			sync: () => {}
+			writeFileSync: () => {},
+			mkdirsSync: () => {}
 		});
 
 		mockery.registerMock('globby', {
@@ -93,7 +90,7 @@ describe('The main runner', () => {
 
 	it('Creates CSS module files', async () => {
 		const writeFileSyncStub: sinon.SinonStub = sandbox.stub();
-		const mkdirpSyncStub: sinon.SinonStub = sandbox.stub();
+		const mkdirsSyncStub: sinon.SinonStub = sandbox.stub();
 
 		const joinStub: sinon.SinonStub = sandbox.stub();
 
@@ -127,11 +124,8 @@ describe('The main runner', () => {
 
 		mockery.registerMock('fs-extra', {
 			existsSync: () => true,
-			writeFileSync: writeFileSyncStub
-		});
-
-		mockery.registerMock('mkdirp', {
-			sync: mkdirpSyncStub
+			writeFileSync: writeFileSyncStub,
+			mkdirsSync: mkdirsSyncStub
 		});
 
 		mockery.registerMock('globby', {
@@ -151,9 +145,9 @@ describe('The main runner', () => {
 			}
 		);
 
-		assert.equal(mkdirpSyncStub.callCount, 2);
-		assert.deepEqual(mkdirpSyncStub.firstCall.args, ['src/themes/testName/theme-key-1']);
-		assert.deepEqual(mkdirpSyncStub.secondCall.args, ['src/themes/testName/theme-key-2']);
+		assert.equal(mkdirsSyncStub.callCount, 2);
+		assert.deepEqual(mkdirsSyncStub.firstCall.args, ['src/themes/testName/theme-key-1']);
+		assert.deepEqual(mkdirsSyncStub.secondCall.args, ['src/themes/testName/theme-key-2']);
 
 		assert.equal(writeFileSyncStub.callCount, 2);
 		assert.deepEqual(writeFileSyncStub.firstCall.args, ['new/file/path-1', 'css file contents']);
@@ -192,11 +186,8 @@ describe('The main runner', () => {
 
 		mockery.registerMock('fs-extra', {
 			existsSync: () => true,
-			writeFileSync: () => {}
-		});
-
-		mockery.registerMock('mkdirp', {
-			sync: () => {}
+			writeFileSync: () => {},
+			mkdirsSync: () => {}
 		});
 
 		mockery.registerMock('globby', {

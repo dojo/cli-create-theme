@@ -21,12 +21,14 @@ function getFileQuestions(packageName: string, files: string[], cssDataFileExten
 			type: 'checkbox',
 			message: `Which of the ${packageName} theme files would you like to scaffold?`,
 			name: 'files',
-			choices: files.map((name: string): inquirer.ChoiceType => {
-				return {
-					name: basename(name).split(cssDataFileExtension)[0],
-					value: name
-				};
-			})
+			choices: files.map(
+				(name: string): inquirer.ChoiceType => {
+					return {
+						name: basename(name).split(cssDataFileExtension)[0],
+						value: name
+					};
+				}
+			)
 		}
 	];
 }

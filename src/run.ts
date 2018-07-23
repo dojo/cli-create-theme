@@ -1,7 +1,7 @@
 import { Helper } from '@dojo/cli/interfaces';
 import * as fs from 'fs-extra';
 import * as globby from 'globby';
-import * as mkdirp from 'mkdirp';
+import { mkdirsSync } from 'fs-extra';
 import { join, basename } from 'path';
 
 import WidgetDataInterface from './WidgetDataInterface';
@@ -38,24 +38,26 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 			throw new Error('No widgets were selected');
 		}
 
-		const themedWidgets = selectedWidgets.map((selectedWidget: string): WidgetDataInterface => {
-			const [fileName] = basename(selectedWidget).split(cssDataFileExtension);
-			const themeKey = join(packageName, fileName);
-			const fullWidgetPath = join(process.cwd(), selectedWidget);
-			const selectors = Object.keys(require(fullWidgetPath));
+		const themedWidgets = selectedWidgets.map(
+			(selectedWidget: string): WidgetDataInterface => {
+				const [fileName] = basename(selectedWidget).split(cssDataFileExtension);
+				const themeKey = join(packageName, fileName);
+				const fullWidgetPath = join(process.cwd(), selectedWidget);
+				const selectors = Object.keys(require(fullWidgetPath));
 
-			const newFileOutput = convertSelectorsToCSS(selectors);
-			const widgetThemePath = `${themesDirectory}/${themeKey}`;
-			const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
+				const newFileOutput = convertSelectorsToCSS(selectors);
+				const widgetThemePath = `${themesDirectory}/${themeKey}`;
+				const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
 
-			mkdirp.sync(widgetThemePath);
-			fs.writeFileSync(newFilePath, newFileOutput);
+				mkdirsSync(widgetThemePath);
+				fs.writeFileSync(newFilePath, newFileOutput);
 
-			return {
-				themeKey,
-				fileName
-			};
-		});
+				return {
+					themeKey,
+					fileName
+				};
+			}
+		);
 
 		allWidgets.push(...themedWidgets);
 	}

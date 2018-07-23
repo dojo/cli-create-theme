@@ -1,6 +1,6 @@
 {
   "name": "@dojo/cli-create-theme",
-  "version": "2.0.1-pre",
+  "version": "3.0.0-pre",
   "description": "Command to scaffold out a new theme",
   "engines": {
     "npm": ">=3.0.0",
@@ -23,37 +23,41 @@
     "url": "https://github.com/dojo/cli-create-theme.git"
   },
   "scripts": {
-    "prepublish": "grunt peerDepInstall",
+    "build:static:dev": "cpx \"src/templates/**/*\" dist/dev/src/templates",
+    "build:static:release": "cpx \"src/templates/**/*\" dist/release/templates",
+    "build:cjs": "tsc",
+    "build": "npm-run-all -p build:** -s package",
+    "clean": "rimraf dist coverage",
+    "intern": "intern",
+    "lint:tslint": "tslint -p .",
+    "lint:prettier": "prettier -l \"{src,tests}/**/*.{ts,tsx}\"",
+    "lint": "run-p lint:*",
+    "package": "dojo-package",
     "precommit": "lint-staged",
-    "prettier": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
-    "test": "grunt test"
+    "prettier": "prettier --write \"{src,tests}/**/*.{ts,tsx}\"",
+    "test": "run-s lint build intern",
+    "uploadCoverage": "codecov --file=coverage/coverage.json",
+    "watch:ts": "dojo-tsc-watcher -p tsconfig.json -- dojo-package",
+    "watch": "run-p watch:ts \"build:static:** -- --watch\""
   },
   "devDependencies": {
-    "@dojo/cli": "^2.0.0",
+    "@dojo/cli": "^3.0.0-alpha.1",
     "@dojo/loader": "^2.0.0",
+    "@dojo/scripts": "^3.0.0-alpha.6",
     "@types/camelcase": "^4.1.0",
     "@types/fs-extra": "^4.0.5",
-    "@types/glob": "5.0.*",
     "@types/globby": "^6.1.0",
-    "@types/grunt": "0.4.*",
     "@types/inquirer": "0.0.35",
-    "@types/mkdirp": "^0.5.2",
     "@types/mockery": "^1.4.29",
     "@types/node": "~9.6.5",
-    "@types/sinon": "^4.0.0",
-    "codecov.io": "0.1.6",
-    "grunt": "~1.0.1",
-    "grunt-dojo2": "latest",
-    "grunt-tslint": "5.0.1",
+    "@types/sinon": "~4.3.3",
+    "codecov": "~3.0.4",
+    "cpx": "~1.5.0",
     "husky": "0.14.3",
-    "intern": "~4.1.0",
     "lint-staged": "6.0.0",
     "mockery": "^2.1.0",
-    "prettier": "1.9.2",
-    "sinon": "^4.1.2",
-    "tslint": "5.2.0",
-    "tslint-plugin-prettier": "1.3.0",
-    "typescript": "~2.6.1"
+    "npm-run-all": "~4.1.3",
+    "sinon": "~4.5.0"
   },
   "dependencies": {
     "camelcase": "^4.1.0",
@@ -61,7 +65,6 @@
     "fs-extra": "^4.0.2",
     "globby": "^7.1.1",
     "inquirer": "^4.0.1",
-    "mkdirp": "^0.5.1",
     "pkg-dir": "^2.0.0"
   },
   "lint-staged": {
