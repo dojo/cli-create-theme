@@ -1,5 +1,6 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
+import { join } from 'path';
 
 const { describe, it, beforeEach, afterEach } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
@@ -46,7 +47,10 @@ describe('The main runner', () => {
 			errorMessage = err;
 		}
 
-		assert.equal(errorMessage, 'Error: This package path does not exist: node_modules/some-package/theme');
+		assert.equal(
+			errorMessage,
+			'Error: This package path does not exist: ' + join('node_modules', 'some-package', 'theme')
+		);
 	});
 
 	it('errors if no widgets selections are made', async () => {

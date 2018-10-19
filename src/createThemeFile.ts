@@ -30,6 +30,7 @@ function createThemeFile({
 	}
 
 	const CSSModulesData = themedWidgets.map(({ themeKey, fileName }) => {
+		themeKey = themeKey.split(/[\\]+/).join('/');
 		const CSSModulePath = `${themeKey}/${fileName}${CSSModuleExtension}`;
 		const themeKeyVariable = camelcase(fileName);
 
