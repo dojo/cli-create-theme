@@ -16,7 +16,8 @@ describe('create theme file', () => {
 		renderFilesStub = sandbox.stub();
 
 		createThemeFileConfig = {
-			themesDirectory: 'path/to/theme/directory',
+			absoluteThemeFilePath: 'absolute/dest/file/path',
+			relativeThemeFilePath: 'relative/dest/file/path',
 			themedWidgets: [{ themeKey: 'theme-key', fileName: 'some-file-name' }],
 			CSSModuleExtension: '.ext',
 			renderFiles: renderFilesStub
@@ -40,9 +41,7 @@ describe('create theme file', () => {
 	});
 
 	it('creates a new theme file', () => {
-		joinStub.onCall(0).returns('relative/dest/file/path');
-		joinStub.onCall(1).returns('absolute/dest/file/path');
-		joinStub.onCall(2).returns('path/to/src');
+		joinStub.onCall(0).returns('path/to/src');
 
 		mockery.registerMock('camelcase', () => 'camelcased');
 

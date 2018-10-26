@@ -21,6 +21,13 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 	const packageNames = await askForPackageNames(packageQuestions);
 	const allWidgets = [];
 
+	const relativeThemeFilePath = join(themesDirectory, 'theme.ts');
+	const absoluteThemeFilePath = join(process.cwd(), relativeThemeFilePath);
+
+	if (fs.existsSync(absoluteThemeFilePath)) {
+		throw new Error(`A theme file already exists in '${relativeThemeFilePath}'`);
+	}
+
 	for (const packageName of packageNames) {
 		const selectedpackagePath = join('node_modules', packageName, 'theme');
 
@@ -64,7 +71,8 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 
 	createThemeFile({
 		renderFiles: helper.command.renderFiles,
-		themesDirectory,
+		absoluteThemeFilePath,
+		relativeThemeFilePath,
 		themedWidgets: allWidgets,
 		CSSModuleExtension
 	});

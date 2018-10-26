@@ -1,6 +1,5 @@
 import { join } from 'path';
 import * as camelcase from 'camelcase';
-import * as fs from 'fs-extra';
 import chalk from 'chalk';
 import WidgetDataInterface from './WidgetDataInterface';
 
@@ -8,27 +7,18 @@ const pkgDir: any = require('pkg-dir');
 const packagePath = pkgDir.sync(__dirname);
 
 function createThemeFile({
-	themesDirectory,
+	relativeThemeFilePath,
+	absoluteThemeFilePath,
 	themedWidgets,
 	CSSModuleExtension,
 	renderFiles
 }: {
-	themesDirectory: string;
+	relativeThemeFilePath: string;
+	absoluteThemeFilePath: string;
 	themedWidgets: WidgetDataInterface[];
 	CSSModuleExtension: string;
 	renderFiles: any;
 }): void {
-	const mainThemeFileName = `theme.ts`;
-	const relativeThemeFilePath = join(themesDirectory, mainThemeFileName);
-	const absoluteThemeFilePath = join(process.cwd(), relativeThemeFilePath);
-
-	if (fs.existsSync(absoluteThemeFilePath)) {
-		console.info(
-			`A theme file already exists in '${chalk.bold.underline(relativeThemeFilePath)}'. Will not overwrite.`
-		);
-		return;
-	}
-
 	const CSSModulesData = themedWidgets.map(({ themeKey, fileName }) => {
 		themeKey = themeKey.split(/[\\]+/).join('/');
 		const CSSModulePath = `${themeKey}/${fileName}${CSSModuleExtension}`;
@@ -41,7 +31,7 @@ function createThemeFile({
 		};
 	});
 
-	const src = join(packagePath, 'templates', 'src', `${mainThemeFileName}.ejs`);
+	const src = join(packagePath, 'templates', 'src', `theme.ts.ejs`);
 
 	renderFiles(
 		[
