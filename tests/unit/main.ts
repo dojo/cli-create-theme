@@ -55,7 +55,7 @@ describe('The main runner', () => {
 
 	it('errors if no widgets selections are made', async () => {
 		mockery.registerMock('./createThemeFile', noopModule);
-		mockery.registerMock('./convertSelectorsToCSS', noopModule);
+		mockery.registerMock('./convertSelectors', noopModule);
 
 		mockery.registerMock('./questions', {
 			packageQuestions: 'a question',
@@ -109,17 +109,20 @@ describe('The main runner', () => {
 		joinStub.onCall(4).returns('theme-key-1');
 		joinStub.onCall(5).returns('./widget/path/1');
 		joinStub.onCall(6).returns('new/file/path-1');
+		joinStub.onCall(7).returns('new/file/path-1-definition');
 
-		joinStub.onCall(7).returns('theme-key-2');
-		joinStub.onCall(8).returns('./widget/path/2');
-		joinStub.onCall(9).returns('new/file/path-2');
+		joinStub.onCall(8).returns('theme-key-2');
+		joinStub.onCall(9).returns('./widget/path/2');
+		joinStub.onCall(10).returns('new/file/path-2');
+		joinStub.onCall(11).returns('new/file/path-2-definition');
 
 		mockery.registerMock('./widget/path/1', { key: 'value' });
 		mockery.registerMock('./widget/path/2', { key: 'value2' });
 
 		mockery.registerMock('./createThemeFile', noopModule);
-		mockery.registerMock('./convertSelectorsToCSS', {
-			default: () => 'css file contents'
+		mockery.registerMock('./convertSelectors', {
+			convertSelectorsToCSS: () => 'css file contents',
+			convertSelectorsToDefinition: () => 'css definition file contents'
 		});
 
 		mockery.registerMock('./questions', {
@@ -164,9 +167,17 @@ describe('The main runner', () => {
 		assert.deepEqual(mkdirsSyncStub.firstCall.args, ['src/themes/testName/theme-key-1']);
 		assert.deepEqual(mkdirsSyncStub.secondCall.args, ['src/themes/testName/theme-key-2']);
 
-		assert.equal(writeFileSyncStub.callCount, 2);
-		assert.deepEqual(writeFileSyncStub.firstCall.args, ['new/file/path-1', 'css file contents']);
-		assert.deepEqual(writeFileSyncStub.secondCall.args, ['new/file/path-2', 'css file contents']);
+		assert.equal(writeFileSyncStub.callCount, 4);
+		assert.deepEqual(writeFileSyncStub.firstCall.args, [
+			'new/file/path-1-definition',
+			'css definition file contents'
+		]);
+		assert.deepEqual(writeFileSyncStub.secondCall.args, ['new/file/path-1', 'css file contents']);
+		assert.deepEqual(writeFileSyncStub.thirdCall.args, [
+			'new/file/path-2-definition',
+			'css definition file contents'
+		]);
+		assert.deepEqual(writeFileSyncStub.getCall(3).args, ['new/file/path-2', 'css file contents']);
 	});
 
 	it('Creates a theme file', async () => {
@@ -179,14 +190,16 @@ describe('The main runner', () => {
 		joinStub.onCall(4).returns('theme-key-1');
 		joinStub.onCall(5).returns('./widget/path/1');
 		joinStub.onCall(6).returns('new/file/path-1');
+		joinStub.onCall(7).returns('new/file/path-1-definition');
 
 		mockery.registerMock('./widget/path/1', { key: 'value' });
 
 		mockery.registerMock('./createThemeFile', {
 			default: createThemeFileStub
 		});
-		mockery.registerMock('./convertSelectorsToCSS', {
-			default: () => 'css file contents'
+		mockery.registerMock('./convertSelectors', {
+			convertSelectorsToCSS: () => 'css file contents',
+			convertSelectorsToDefinition: () => 'css definition file contents'
 		});
 
 		mockery.registerMock('./questions', {
@@ -206,6 +219,7 @@ describe('The main runner', () => {
 		existsSyncStub.returns(true);
 		mockery.registerMock('fs-extra', {
 			existsSync: existsSyncStub,
+			copyFileSync: () => {},
 			writeFileSync: () => {},
 			mkdirsSync: () => {}
 		});

@@ -1,5 +1,5 @@
 import './main';
 import './questions';
-import './convertSelectorsToCSS';
+import './convertSelectors';
 import './createThemeFile';
 import './register';

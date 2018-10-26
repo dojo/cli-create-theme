@@ -6,7 +6,7 @@ import { join, basename } from 'path';
 
 import WidgetDataInterface from './WidgetDataInterface';
 import createThemeFile from './createThemeFile';
-import convertSelectorsToCSS from './convertSelectorsToCSS';
+import { convertSelectorsToCSS, convertSelectorsToDefinition } from './convertSelectors';
 
 import { packageQuestions, getFileQuestions, askForDesiredFiles, askForPackageNames } from './questions';
 
@@ -17,6 +17,7 @@ export interface CreateThemeArgs {
 async function run(helper: Helper, args: CreateThemeArgs) {
 	const themeName = args.name;
 	const CSSModuleExtension = '.m.css';
+	const CSSModuleDefinitionExtension = `${CSSModuleExtension}.d.ts`;
 	const themesDirectory = `src/themes/${themeName}`;
 	const packageNames = await askForPackageNames(packageQuestions);
 	const allWidgets = [];
@@ -52,11 +53,18 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 				const fullWidgetPath = join(process.cwd(), selectedWidget);
 				const selectors = Object.keys(require(fullWidgetPath));
 
-				const newFileOutput = convertSelectorsToCSS(selectors);
 				const widgetThemePath = `${themesDirectory}/${themeKey}`;
-				const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
-
 				mkdirsSync(widgetThemePath);
+
+				const newFileOutput = convertSelectorsToCSS(selectors);
+				const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
+				const newDefinitionFileOutput = convertSelectorsToDefinition(selectors);
+				const newDefinitionFilePath = join(
+					process.cwd(),
+					`${widgetThemePath}/${fileName}${CSSModuleDefinitionExtension}`
+				);
+
+				fs.writeFileSync(newDefinitionFilePath, newDefinitionFileOutput);
 				fs.writeFileSync(newFilePath, newFileOutput);
 
 				return {
