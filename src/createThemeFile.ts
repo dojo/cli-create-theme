@@ -3,6 +3,7 @@ import * as camelcase from 'camelcase';
 import * as fs from 'fs-extra';
 import chalk from 'chalk';
 import WidgetDataInterface from './WidgetDataInterface';
+import { info } from './logging';
 
 const pkgDir: any = require('pkg-dir');
 const packagePath = pkgDir.sync(__dirname);
@@ -23,9 +24,7 @@ function createThemeFile({
 	const absoluteThemeFilePath = join(process.cwd(), relativeThemeFilePath);
 
 	if (fs.existsSync(absoluteThemeFilePath)) {
-		console.info(
-			`A theme file already exists in '${chalk.bold.underline(relativeThemeFilePath)}'. Will not overwrite.`
-		);
+		info(`A theme file already exists in '${chalk.bold.underline(relativeThemeFilePath)}'. Will not overwrite.`);
 		return;
 	}
 
@@ -55,9 +54,7 @@ function createThemeFile({
 		}
 	);
 
-	console.info(
-		`\nPlease import '${chalk.bold.underline(relativeThemeFilePath)}' into your project to use your new theme`
-	);
+	info(`\nPlease import '${chalk.bold.underline(relativeThemeFilePath)}' into your project to use your new theme`);
 }
 
 export default createThemeFile;
