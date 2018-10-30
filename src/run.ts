@@ -3,12 +3,14 @@ import * as fs from 'fs-extra';
 import * as globby from 'globby';
 import { mkdirsSync } from 'fs-extra';
 import { join, basename } from 'path';
+import chalk from 'chalk';
 
 import WidgetDataInterface from './WidgetDataInterface';
 import createThemeFile from './createThemeFile';
 import convertSelectorsToCSS from './convertSelectorsToCSS';
 
 import { packageQuestions, getFileQuestions, askForDesiredFiles, askForPackageNames } from './questions';
+import { info } from './logging';
 
 export interface CreateThemeArgs {
 	name: string;
@@ -51,6 +53,7 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 
 				mkdirsSync(widgetThemePath);
 				fs.writeFileSync(newFilePath, newFileOutput);
+				info(chalk.green.bold(' create ') + newFilePath);
 
 				return {
 					themeKey,
