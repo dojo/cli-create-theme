@@ -1,6 +1,7 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
 import { join } from 'path';
+import chalk from 'chalk';
 
 const { describe, it, beforeEach, afterEach } = intern.getInterface('bdd');
 const { assert } = intern.getPlugin('chai');
@@ -103,6 +104,8 @@ describe('The main runner', () => {
 		const mkdirsSyncStub: sinon.SinonStub = sandbox.stub();
 
 		const joinStub: sinon.SinonStub = sandbox.stub();
+		const loggingStub: sinon.SinonStub = sandbox.stub();
+
 		joinStub.onCall(0).returns('relative/dest/file/path');
 		joinStub.onCall(1).returns('absolute/dest/file/path');
 
@@ -135,6 +138,10 @@ describe('The main runner', () => {
 		mockery.registerMock('path', {
 			join: joinStub,
 			basename: () => 'basename return string'
+		});
+
+		mockery.registerMock('./logging', {
+			info: loggingStub
 		});
 
 		const existsSyncStub: sinon.SinonStub = sandbox.stub();
@@ -178,6 +185,10 @@ describe('The main runner', () => {
 			'css definition file contents'
 		]);
 		assert.deepEqual(writeFileSyncStub.getCall(3).args, ['new/file/path-2', 'css file contents']);
+
+		assert.equal(loggingStub.callCount, 2);
+		assert.deepEqual(loggingStub.firstCall.args, [chalk.green.bold(' create ') + 'new/file/path-1']);
+		assert.deepEqual(loggingStub.secondCall.args, [chalk.green.bold(' create ') + 'new/file/path-2']);
 	});
 
 	it('Creates a theme file', async () => {

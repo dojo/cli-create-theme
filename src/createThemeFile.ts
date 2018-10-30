@@ -2,6 +2,7 @@ import { join } from 'path';
 import * as camelcase from 'camelcase';
 import chalk from 'chalk';
 import WidgetDataInterface from './WidgetDataInterface';
+import { info } from './logging';
 
 const pkgDir: any = require('pkg-dir');
 const packagePath = pkgDir.sync(__dirname);
@@ -45,9 +46,7 @@ function createThemeFile({
 		}
 	);
 
-	console.info(
-		`\nPlease import '${chalk.bold.underline(relativeThemeFilePath)}' into your project to use your new theme`
-	);
+	info(`\nPlease import '${chalk.bold.underline(relativeThemeFilePath)}' into your project to use your new theme`);
 }
 
 export default createThemeFile;
