@@ -1,6 +1,10 @@
-<% for (var module in CSSModules) { %>import * as <%= CSSModules[module].themeKeyVariable %> from './<%= CSSModules[module].path %>';
-<% } %>
+<% for (var module in CSSModules) { -%>
+import * as <%= CSSModules[module].themeKeyVariable %> from './<%= CSSModules[module].path %>';
+<% } -%>
+
 export default {
-<% for(var i=0; i < CSSModules.length - 1; i++) { %>	'<%= CSSModules[i].themeKey %>': <%= CSSModules[i].themeKeyVariable %>,
-<% } %>	'<%= CSSModules[CSSModules.length - 1].themeKey %>': <%= CSSModules[CSSModules.length - 1].themeKeyVariable %>
+<% for(var i=0; i < CSSModules.length - 1; i++) { -%>
+	'<%= CSSModules[i].themeKey %>': <%= CSSModules[i].themeKeyVariable %>,
+<% } -%>
+	'<%= CSSModules[CSSModules.length - 1].themeKey %>': <%= CSSModules[CSSModules.length - 1].themeKeyVariable %>
 };
