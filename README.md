@@ -36,6 +36,18 @@ Run the command: `dojo create theme`.
 
 For example, if you have widgets which live in the folder: `node_modules/@dojo/widgets`, you can enter: `@dojo/widgets` as the answer to `What Package to do you want to theme?`.
 
+### Compatible packages
+
+Any package that has a `theme` directory containing `.m.css` and coresponding, compiled definition files (`.m.css.js`) is compatible.
+
+```
+node_modules
+└── package
+    └── theme
+        │   theme-file.m.css
+        │   theme-file.m.css.js
+```
+
 ## How do I contribute?
 
 We appreciate your interest!  Please see the [Dojo 2 Meta Repository](https://github.com/dojo/meta#readme) for the Contributing Guidelines.
