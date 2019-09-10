@@ -7,7 +7,7 @@ import chalk from 'chalk';
 
 import WidgetDataInterface from './WidgetDataInterface';
 import createThemeFile from './createThemeFile';
-import convertSelectorsToCSS from './convertSelectorsToCSS';
+import { convertSelectorsToCSS, convertSelectorsToDefinition } from './convertSelectors';
 
 import { packageQuestions, getFileQuestions, askForDesiredFiles, askForPackageNames } from './questions';
 import { info } from './logging';
@@ -19,9 +19,17 @@ export interface CreateThemeArgs {
 async function run(helper: Helper, args: CreateThemeArgs) {
 	const themeName = args.name;
 	const CSSModuleExtension = '.m.css';
+	const CSSModuleDefinitionExtension = `${CSSModuleExtension}.d.ts`;
 	const themesDirectory = `src/themes/${themeName}`;
 	const packageNames = await askForPackageNames(packageQuestions);
 	const allWidgets = [];
+
+	const relativeThemeFilePath = join(themesDirectory, 'theme.ts');
+	const absoluteThemeFilePath = join(process.cwd(), relativeThemeFilePath);
+
+	if (fs.existsSync(absoluteThemeFilePath)) {
+		throw new Error(`A theme file already exists in '${relativeThemeFilePath}'`);
+	}
 
 	for (const packageName of packageNames) {
 		const selectedpackagePath = join('node_modules', packageName, 'theme');
@@ -47,11 +55,18 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 				const fullWidgetPath = join(process.cwd(), selectedWidget);
 				const selectors = Object.keys(require(fullWidgetPath));
 
-				const newFileOutput = convertSelectorsToCSS(selectors);
 				const widgetThemePath = `${themesDirectory}/${themeKey}`;
-				const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
-
 				mkdirsSync(widgetThemePath);
+
+				const newFileOutput = convertSelectorsToCSS(selectors);
+				const newFilePath = join(process.cwd(), `${widgetThemePath}/${fileName}${CSSModuleExtension}`);
+				const newDefinitionFileOutput = convertSelectorsToDefinition(selectors);
+				const newDefinitionFilePath = join(
+					process.cwd(),
+					`${widgetThemePath}/${fileName}${CSSModuleDefinitionExtension}`
+				);
+
+				fs.writeFileSync(newDefinitionFilePath, newDefinitionFileOutput);
 				fs.writeFileSync(newFilePath, newFileOutput);
 				info(chalk.green.bold(' create ') + newFilePath);
 
@@ -67,7 +82,8 @@ async function run(helper: Helper, args: CreateThemeArgs) {
 
 	createThemeFile({
 		renderFiles: helper.command.renderFiles,
-		themesDirectory,
+		absoluteThemeFilePath,
+		relativeThemeFilePath,
 		themedWidgets: allWidgets,
 		CSSModuleExtension
 	});
